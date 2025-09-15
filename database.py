@@ -1,13 +1,16 @@
-# database.py (dùng Supabase Postgres)
+# database.py
 import psycopg2
-import os
+import streamlit as st
 import random
 
-# Copy nguyên URI từ Supabase
-DATABASE_URL = "postgresql://postgres:GdRYolLlLlqrCU7c@db.fdrkdwzkludmyoezlowd.supabase.co:5432/postgres"
+# Lấy connection string từ Streamlit Secrets
+# Bạn cần thêm vào Settings → Secrets của Streamlit Cloud:
+# DATABASE_URL="postgresql://postgres:YOUR_PASSWORD@db.xxx.supabase.co:5432/postgres"
+DATABASE_URL = st.secrets["DATABASE_URL"]
 
 def get_connection():
-    return psycopg2.connect(DATABASE_URL)
+    # Kết nối tới Supabase (bắt buộc SSL)
+    return psycopg2.connect(DATABASE_URL, sslmode="require")
 
 def init_db():
     conn = get_connection()
@@ -123,5 +126,5 @@ def save_answer(problem_id, variant_text, answer):
     cur.close()
     conn.close()
 
-# Khởi tạo DB
+# Tạo bảng nếu chưa có
 init_db()
